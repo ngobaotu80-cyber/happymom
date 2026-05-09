@@ -1,158 +1,31 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>母亲节快乐 ❤️</title>
+    <title>母亲节快乐</title>
     <style>
-        :root {
-            --pink: #ff85a2;
-            --dark-pink: #d81e06;
-            --green: #4caf50;
-        }
-
-        body {
-            margin: 0;
-            background: linear-gradient(to bottom, #fff5f7, #ffe0e9);
-            font-family: "Microsoft YaHei", sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            overflow: hidden;
-            text-align: center;
-        }
-
-        /* 引导界面 */
-        #start-screen {
-            position: fixed;
-            inset: 0;
-            background: white;
-            z-index: 999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        #play-btn {
-            padding: 15px 30px;
-            background: var(--pink);
-            color: white;
-            border: none;
-            border-radius: 30px;
-            font-size: 1.2rem;
-            box-shadow: 0 4px 15px rgba(255,133,162,0.4);
-            cursor: pointer;
-            animation: pulse 1.5s infinite;
-        }
-
-        /* 康乃馨动画 */
-        .flower-container {
-            position: relative;
-            height: 260px;
-            width: 200px;
-            display: none; /* 初始隐藏 */
-            animation: popUp 1s ease-out forwards;
-        }
-
-        .flower { position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%); }
-        .petal {
-            width: 45px; height: 45px; background: var(--pink);
-            border-radius: 50% 50% 0 50%; position: absolute;
-            border: 1px solid #ffb3c1;
-        }
-        .p1 { transform: rotate(0deg) translate(18px); }
-        .p2 { transform: rotate(72deg) translate(18px); }
-        .p3 { transform: rotate(144deg) translate(18px); }
-        .p4 { transform: rotate(216deg) translate(18px); }
-        .p5 { transform: rotate(288deg) translate(18px); }
-        .stem { width: 6px; height: 120px; background: var(--green); margin: 45px auto 0; border-radius: 3px; }
-
-        /* 文字特效 */
-        #blessing-text {
-            margin-top: 20px;
-            color: var(--dark-pink);
-            font-size: 1.4rem;
-            font-weight: bold;
-            opacity: 0;
-            line-height: 1.8;
-            padding: 0 30px;
-        }
-
-        /* 爱心飘落 */
-        .heart {
-            position: absolute; color: var(--pink);
-            font-size: 20px; user-select: none;
-            animation: fall linear forwards;
-        }
-
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
-        @keyframes popUp { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        @keyframes fall { to { transform: translateY(100vh) rotate(360deg); opacity: 0; } }
-        .fade-in { animation: fadeIn 2s forwards; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        body { background: #fff5f7; text-align: center; font-family: sans-serif; overflow: hidden; }
+        .flower { font-size: 80px; margin-top: 20vh; animation: grow 1.5s ease-out; }
+        @keyframes grow { from { transform: scale(0); } to { transform: scale(1); } }
+        .text { color: #d81e06; font-size: 24px; font-weight: bold; margin-top: 20px; opacity: 0; transition: 2s; }
+        .show { opacity: 1; }
+        #btn { padding: 15px 30px; background: #ff85a2; color: white; border: none; border-radius: 25px; margin-top: 40vh; font-size: 18px; }
     </style>
 </head>
 <body>
-
-    <div id="start-screen">
-        <button id="play-btn">点开妈妈的惊喜 ❤️</button>
+    <div id="start"><button id="btn" onclick="start()">点开给妈妈的惊喜 ❤️</button></div>
+    <div id="content" style="display:none">
+        <div class="flower">🌸</div>
+        <div id="msg" class="text">妈妈，母亲节快乐！<br>听妈妈的话，别让她受伤~</div>
     </div>
-
-    <div id="flower-box" class="flower-container">
-        <div class="flower">
-            <div class="petal p1"></div><div class="petal p2"></div>
-            <div class="petal p3"></div><div class="petal p4"></div>
-            <div class="petal p5"></div>
-            <div class="stem"></div>
-        </div>
-    </div>
-
-    <div id="blessing-text">
-        听妈妈的话，别让她受伤~ <br>
-        <span style="font-size: 1rem; color: #666;">（音乐播放中...）</span><br><br>
-        亲爱的妈妈：<br>
-        感谢您的辛勤付出，<br>
-        希望您每天都像花儿一样灿烂！<br>
-        母亲节快乐！
-    </div>
-
-    <!-- 音乐链接：听妈妈的话 (伴奏/精选片段) -->
-    <audio id="bgm" loop>
-        <source src="https://music.163.com/song/media/outer/url?id=185965.mp3" type="audio/mpeg">
-    </audio>
-
+    <audio id="music" loop><source src="https://music.163.com/song/media/outer/url?id=185965.mp3" type="audio/mpeg"></audio>
     <script>
-        const btn = document.getElementById('play-btn');
-        const startScreen = document.getElementById('start-screen');
-        const flowerBox = document.getElementById('flower-box');
-        const text = document.getElementById('blessing-text');
-        const bgm = document.getElementById('bgm');
-
-        btn.addEventListener('click', () => {
-            startScreen.style.display = 'none';
-            flowerBox.style.display = 'block';
-            bgm.play().catch(() => {
-                alert("请手动点击播放音频");
-            });
-
-            setTimeout(() => {
-                text.classList.add('fade-in');
-                setInterval(createHeart, 400); // 开始飘落爱心
-            }, 1000);
-        });
-
-        
-
-        function createHeart() {
-            const heart = document.createElement('div');
-            heart.classList.add('heart');
-            heart.innerHTML = '❤️';
-            heart.style.left = Math.random() * 100 + 'vw';
-            heart.style.animationDuration = Math.random() * 2 + 3 + 's';
-            document.body.appendChild(heart);
-            setTimeout(() => heart.remove(), 5000);
+        function start(){
+            document.getElementById('start').style.display='none';
+            document.getElementById('content').style.display='block';
+            document.getElementById('music').play();
+            setTimeout(()=>{ document.getElementById('msg').classList.add('show'); }, 500);
         }
     </script>
 </body>
